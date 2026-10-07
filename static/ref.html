@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>成绩录入</title>
+<link rel="stylesheet" href="/static/style/ref.css">
+</head>
+<body>
+
+<h1>成绩录入</h1>
+<div class="hint">录入后点「推送到大屏」，所有设备实时同步</div>
+
+<input id="event" placeholder="项目名称（如：男子100米 决赛）">
+<div id="rows"></div>
+<button onclick="addRow()">+ 添加选手</button>
+
+<div class="actions">
+  <button onclick="submit(false)">推送到大屏</button>
+  <button onclick="submit(true)" style="background:#b8860b;color:#fff">锁定成绩</button>
+</div>
+
+<div class="credit" translate="no">HelloGYM</div>
+
+<div class="status" id="status"></div>
+
+<script>
+let labels = { rank: "名次", name: "姓名", team: "单位", score: "成绩", record: "破纪录" };
+
+function addRow() {
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.innerHTML = `
+    <input class="name"  placeholder="${labels.name}"  autocomplete="off">
+    <input class="team"  placeholder="${labels.team}"  autocomplete="off">
+    <input class="score" placeholder="${labels.score}" inputmode="decimal" autocomplete="off">
+  `;
+  document.getElementById('rows').appendChild(div);
+}
+
+function refreshPlaceholders() {
+  document.querySelectorAll('.name').forEach(el => el.placeholder = labels.name);
+  document.querySelectorAll('.team').forEach(el => el.placeholder = labels.team);
+  document.querySelectorAll('.score').forEach(el => el.placeholder = labels.score);
+}
+
+async function loadConfig() {
+  try {
+    const r = await fetch('/api/config');
+    const cfg = await r.json();
+    if (cfg.labels) labels = Object.assign(labels, cfg.labels);
+  } catch (e) {}
+  refreshPlaceholders();
+}
+
+function showStatus(text, color = '#0a1430') {
+  const el = document.getElementById('status');
+  el.textContent = text;
+  el.style.background = color;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+async function submit(lock) {
+  const rows = document.querySelectorAll('#rows .row');
+  const results = [];
+  rows.forEach(r => {
+    const name = r.querySelector('.name').value.trim();
+    if (!name) return;
+    let score = r.querySelector('.score').value.trim();
+    if (score) {
+      const n = parseFloat(score);
+      if (!isNaN(n)) score = n.toFixed(2);
+    }
+    results.push({
+      name,
+      team: r.querySelector('.team').value.trim(),
+      score,
+      isRecord: false
+    });
+  });
+  if (!results.length) { alert('请至少填一个选手'); return; }
+
+  try {
+    const res = await fetch('/api/result', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        event: document.getElementById('event').value || '未命名项目',
+        results
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    showStatus((lock ? '已锁定并推送 ' : '已推送到大屏 ') + results.length + ' 条', '#0a7a3a');
+  } catch (e) {
+    showStatus('推送失败：' + e.message, '#a01010');
+  }
+}
+
+loadConfig();
+addRow();
+</script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="google" content="notranslate">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>成绩大屏 · HelloGYM</title>
+<link rel="stylesheet" href="/static/style/screen.css">
+</head>
+<body>
+
+<div class="splash" id="splash">
+  <div class="splash-inner">
+    <div class="splash-brand" translate="no">HelloGYM</div>
+    <div class="splash-sub">运动会大屏系统 · v1.0</div>
+  </div>
+</div>
+
+<div class="screen" id="screen">
+
+  <div class="topbar">
+    <div class="meet-name" id="meetName">运动会</div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+
+  <div class="panel">
+    <div class="event-bar">
+      <span class="tag" id="eventTag">LIVE</span>
+      <span class="event-title" id="eventTitle">等待比赛</span>
+    </div>
+    <div class="table">
+      <div id="resultBody"></div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="credit" translate="no">
+      <span class="brand">HelloGYM</span>
+      <span class="sep">·</span>
+      <span class="ver">v1.0</span>
+    </div>
+    <div class="next-wrap">
+      <span class="next-label" id="nextLabel" style="display:none">NEXT ·</span>
+      <span class="next-name" id="nextName"></span>
+    </div>
+  </div>
+
+</div>
+
+<div class="record-flash" id="flash"></div>
+
+<script>
+const state = {
+  config: {},
+  event: '',
+  results: [],
+  nextEvent: ''
+};
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function render() {
+  try {
+    document.getElementById('meetName').textContent = state.config.meetName || '运动会';
+    document.getElementById('eventTitle').textContent = state.event || '等待比赛';
+
+    const isFinal = /决赛|FINAL/.test(state.event || '');
+    document.getElementById('eventTag').textContent = isFinal ? 'FINAL' : 'LIVE';
+
+    const body = document.getElementById('resultBody');
+
+    if (!state.results || state.results.length === 0) {
+      body.innerHTML = '<div class="empty">· 等 待 成 绩 ·</div>';
+    } else {
+      body.innerHTML = state.results.map((r, i) => {
+        const rank = i + 1;
+        const record = r.isRecord ? '<span class="record">NR</span>' : '';
+        const team = r.team ? escapeHtml(r.team) : '—';
+        return `
+          <div class="row rank-${rank}" style="animation-delay:${i * 50}ms">
+            <div class="rank">${rank}</div>
+            <div class="name">${escapeHtml(r.name)}</div>
+            <div class="team">${team}</div>
+            <div class="score">${escapeHtml(r.score)}${record}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const nn = document.getElementById('nextName');
+    const nl = document.getElementById('nextLabel');
+    if (state.nextEvent) {
+      nn.textContent = state.nextEvent;
+      nl.style.display = 'inline';
+    } else {
+      nn.textContent = '';
+      nl.style.display = 'none';
+    }
+  } catch (e) {
+    console.error('render error:', e);
+  }
+}
+
+function updateClock() {
+  try {
+    document.getElementById('clock').textContent =
+      new Date().toLocaleTimeString('zh-CN', { hour12: false });
+  } catch (e) {}
+}
+
+function startClock() {
+  updateClock();
+  const now = Date.now();
+  const delay = 1000 - (now % 1000);
+  setTimeout(() => {
+    updateClock();
+    setInterval(updateClock, 1000);
+  }, delay);
+}
+startClock();
+
+function connect() {
+  const ws = new WebSocket(`ws://${location.host}/ws`);
+
+  ws.onmessage = (e) => {
+    let msg;
+    try {
+      msg = JSON.parse(e.data);
+    } catch (err) {
+      return;
+    }
+
+    if (msg.type === 'full_state') {
+      state.config = msg.data.config || {};
+      state.event = msg.data.event || '';
+      state.results = msg.data.results || [];
+      state.nextEvent = msg.data.nextEvent || '';
+      render();
+      return;
+    }
+
+    if (msg.type === 'score_update') {
+      const hadRecord = state.results.some(r => r.isRecord);
+      state.event = msg.data.event || '';
+      state.results = msg.data.results || [];
+      if (!hadRecord && state.results.some(r => r.isRecord)) {
+        const f = document.getElementById('flash');
+        if (f) {
+          f.style.animation = 'none';
+          void f.offsetHeight;
+          f.style.animation = 'flash .4s 3';
+        }
+      }
+      render();
+      return;
+    }
+
+    if (msg.type === 'config_update') {
+      state.config = Object.assign(state.config, msg.data);
+      render();
+      return;
+    }
+
+    if (msg.type === 'next_update') {
+      state.nextEvent = msg.data || '';
+      render();
+      return;
+    }
+  };
+
+  ws.onclose = () => setTimeout(connect, 1500);
+  ws.onerror = () => ws.close();
+}
+
+connect();
+
+setTimeout(() => {
+  const sp = document.getElementById('splash');
+  if (sp) {
+    sp.classList.add('hide');
+    setTimeout(() => sp.remove(), 900);
+  }
+}, 1500);
+
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
+    document.body.classList.toggle('debug');
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+requests
+PySide6
+python-multipart
+openpyxl
+qrcode[pil]
+pyinstaller
+websocket-client

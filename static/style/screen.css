@@ -1,0 +1,261 @@
+/* ============================================
+   运动会大屏成绩展示系统
+   screen.css · 大屏样式
+   Author: HelloGYM
+   ============================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100vw; height: 100vh; overflow: hidden; }
+
+body {
+  font-family: 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #fff;
+  background: #0a0d14;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(30, 60, 100, 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(15, 30, 55, 0.6) 0%, transparent 70%);
+}
+
+.screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+
+/* ============ 顶部 ============ */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3.5vh 4vw;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.75);
+}
+.topbar .meet-name {
+  font-weight: 800;
+  font-size: clamp(28px, 2.4vw, 46px);
+}
+.topbar .clock {
+  font-family: Consolas, monospace;
+  font-weight: 700;
+  font-size: clamp(32px, 2.6vw, 52px);
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 0.05em;
+}
+
+/* ============ 中间面板 ============ */
+.panel {
+  flex: 1;
+  margin: 0 4vw 3vh 4vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.event-bar {
+  display: flex;
+  align-items: baseline;
+  gap: 2vw;
+  padding: 0 0 2vh 0;
+}
+.event-bar .tag {
+  font-size: clamp(12px, 0.9vw, 16px);
+  letter-spacing: 0.3em;
+  color: #4ade80;
+  font-weight: 700;
+}
+.event-bar .event-title {
+  font-size: clamp(38px, 4vw, 76px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* ============ 表格 ============ */
+.table {
+  border-top: 2px solid rgba(74, 222, 128, 0.6);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 8vw 1fr 20vw 18vw;
+  align-items: center;
+  padding: 1.3vh 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+  animation: slideIn 0.4s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.row.rank-1::before,
+.row.rank-2::before,
+.row.rank-3::before {
+  content: '';
+  position: absolute;
+  left: -1.6vw; top: 0; bottom: 0;
+  width: 4px;
+}
+.row.rank-1::before { background: #ffd700; }
+.row.rank-2::before { background: #c0c0c0; }
+.row.rank-3::before { background: #cd7f32; }
+
+.row .rank {
+  font-family: Consolas, monospace;
+  font-weight: 900;
+  font-size: clamp(28px, 3vw, 56px);
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1;
+}
+.row.rank-1 .rank { color: #ffd700; }
+.row.rank-2 .rank { color: #c0c0c0; }
+.row.rank-3 .rank { color: #cd7f32; }
+
+.row .name {
+  font-size: clamp(26px, 2.6vw, 50px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row .team {
+  font-size: clamp(16px, 1.3vw, 24px);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row .score {
+  font-family: Consolas, monospace;
+  font-weight: 900;
+  font-size: clamp(30px, 3.2vw, 60px);
+  color: #4ade80;
+  text-align: right;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.row.rank-1 .score { color: #ffd700; }
+
+.row .score .record {
+    display: inline-block;
+    margin-left: 0.6vw;
+    padding: 0.15em 0.5em;
+    font-size: 0.35em;
+    font-family: 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: #1a0f00;
+    background: #ff9500;
+    border-radius: 3px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+/* ============ 底栏 ============ */
+.bottom-bar {
+  padding: 2.5vh 4vw;
+  display: flex;
+  align-items: center;
+  gap: 1.5vw;
+  font-size: clamp(14px, 1.1vw, 20px);
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.bottom-bar .credit {
+  font-size: clamp(11px, 0.8vw, 14px);
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.28);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+}
+.bottom-bar .credit .brand {
+  color: rgba(255, 255, 255, 0.42);
+  font-weight: 700;
+}
+.bottom-bar .credit .sep {
+  color: rgba(255, 255, 255, 0.15);
+}
+.bottom-bar .credit .ver {
+  color: rgba(255, 255, 255, 0.2);
+  font-family: Consolas, monospace;
+  letter-spacing: 0.1em;
+}
+
+.bottom-bar .next-wrap {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+}
+.bottom-bar .next-label {
+  color: #4ade80;
+  font-weight: 700;
+}
+.bottom-bar .next-name {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+/* ============ 空状态 ============ */
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12vh 0;
+  font-size: clamp(20px, 2vw, 36px);
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.3em;
+  font-weight: 300;
+}
+
+/* ============ 破纪录闪光 ============ */
+.record-flash {
+  position: fixed; inset: 0;
+  background: #ffaa00;
+  pointer-events: none; opacity: 0;
+}
+@keyframes flash {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 0.15; }
+}
+
+/* ============ 启动画面 ============ */
+.splash {
+  position: fixed; inset: 0;
+  background: #0a0d14;
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 1;
+  transition: opacity 0.8s ease-out;
+}
+.splash.hide { opacity: 0; pointer-events: none; }
+.splash-inner {
+  text-align: center;
+  animation: splashFadeIn 0.8s ease-out both;
+}
+@keyframes splashFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.splash-brand {
+  font-size: clamp(48px, 6vw, 110px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #4ade80;
+  margin-bottom: 1.5vh;
+}
+.splash-sub {
+  font-size: clamp(14px, 1.1vw, 20px);
+  letter-spacing: 0.4em;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+body.debug { outline: 2px dashed #ff4444; }
+body.debug .row { outline: 1px solid #3388ff; }

@@ -1,0 +1,93 @@
+/* ============================================
+   运动会大屏成绩展示系统
+   ref.css · 手机/平板录入页样式
+   Author: HelloGYM
+   ============================================ */
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  padding: 16px;
+  background: #f0f2f5;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 0 0 8px;
+  color: #0a1430;
+}
+
+.hint {
+  font-size: 12px;
+  color: #667085;
+  margin-bottom: 16px;
+}
+
+input, button {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  font-family: inherit;
+}
+input:focus {
+  outline: 2px solid #ffd700;
+  border-color: #ffd700;
+}
+
+button {
+  background: #0a1430;
+  color: #ffd700;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+button:active { background: #1a2a5a; }
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 90px;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.row input { margin-bottom: 0; }
+.row .name { background: #fffbe6; }
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.actions button { flex: 1; }
+
+.status {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: #0a1430;
+  color: #ffd700;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+}
+.status.show { opacity: 1; }
+
+.credit {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: #a8b0c0;
+  text-align: center;
+  margin: 24px 0 8px 0;
+  font-weight: 600;
+}
